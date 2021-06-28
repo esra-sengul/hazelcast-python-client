@@ -2,9 +2,9 @@
   
   on:
     push:
-      branches: [ coverage ]
+      branches: [ master ]
     pull_request:
-      branches: [ coverage ]	  
+      branches: [ master ]	  
   jobs:
     build-branch:
       runs-on: ubuntu-latest
