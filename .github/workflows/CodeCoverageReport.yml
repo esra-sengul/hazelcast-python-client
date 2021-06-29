@@ -2,9 +2,11 @@
   
   on:
     push:
-      branches: [ CodeCoverage ]
+      branches: 
+       - ${GITHUB_REF##*/}
     pull_request:
-      branches: [ CodeCoverage ]	  
+      branches: 
+        - ${GITHUB_REF##*/}
   jobs:
     build-branch:
       runs-on: ubuntu-latest
