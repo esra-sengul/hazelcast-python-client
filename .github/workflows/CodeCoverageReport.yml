@@ -1,12 +1,6 @@
   name: Report coverage to Codecov
   
-  on:
-    push:
-      branches: 
-       - ${GITHUB_REF##*/}
-    pull_request:
-      branches: 
-        - ${GITHUB_REF##*/}
+  on: [push, pull_request]
   jobs:
     build-branch:
       runs-on: ubuntu-latest
