@@ -32,8 +32,10 @@
             pip install -r requirements-dev.txt
             pip install -r requirements-test.txt
             
-      - name: Setup tmate
-        uses: mxschmitt/action-tmate@v3
+      - name: Run tests
+        env:
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+        run : python run_tests.py
         
       - name: Analyze with SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
