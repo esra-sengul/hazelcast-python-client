@@ -18,6 +18,11 @@
         with:
           distribution: 'adopt'
           java-version: '8'
+      
+      - name: Set up maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.8.1
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -26,14 +31,14 @@
         run : |
             pip install -r requirements-dev.txt
             pip install -r requirements-test.txt
-
-      - name: Run tests
-        env:
-          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
-        run : python run_tests.py
+            
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
         
-      - name: Publish to Codecov 
-        uses: codecov/codecov-action@v1
+      - name: Analyze with SonarCloud
+        uses: sonarsource/sonarcloud-github-action@master
         with:
-          token: ${{ secrets.CODECOV_KEY }}
-          files: ./coverage.xml
+          args: >
+            -Dsonar.organization=devopshazelcast-github
+            -Dsonar.projectKey=hazelcast_hazelcast-python-client
+            -Dsonar.python.coverage.reportPaths=coverage.xml
