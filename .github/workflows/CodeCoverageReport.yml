@@ -46,4 +46,4 @@
           args: >
             -Dsonar.organization=devopshazelcast-github
             -Dsonar.projectKey=hazelcast_hazelcast-python-client
-            -Dsonar.python.coverage.reportPaths=coverage.xml
+            -Dsonar.python.coverage.reportPaths=./coverage.xml
