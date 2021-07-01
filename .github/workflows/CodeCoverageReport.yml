@@ -36,6 +36,10 @@
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
         run : python run_tests.py
+      
+      - name: Fix for coverage.xml
+        run: coverage xml -i
+            
         
       - name: Analyze with SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
