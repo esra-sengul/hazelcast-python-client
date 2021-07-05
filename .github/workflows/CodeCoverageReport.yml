@@ -65,4 +65,4 @@
             -Dsonar.organization=devopshazelcast-github
             -Dsonar.projectKey=hazelcast_hazelcast-python-client
             -Dsonar.python.coverage.reportPaths=./coverage.xml
-            -Dsonar.pullrequest.key= 3     
+            -Dsonar.pullrequest.key=3     
