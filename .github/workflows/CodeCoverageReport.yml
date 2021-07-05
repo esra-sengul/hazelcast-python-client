@@ -8,6 +8,12 @@
       name: Test coverage report.
       steps:
       
+      - name: Get the name of PR branch name
+        uses: mdecoleman/pr-branch-name@1.0.1
+        id: vars
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -40,14 +46,30 @@
       - name: Fix for coverage.xml
         run: coverage xml -i
             
-        
-      - name: Analyze with SonarCloud
+      - name: Analyze with SonarCloud for Merge
+        if: github.event_name == 'push'
         uses: sonarsource/sonarcloud-github-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN : ${{ secrets.TOKEN_GITHUB }}
+          
         with:
           args: >
             -Dsonar.organization=devopshazelcast-github
             -Dsonar.projectKey=hazelcast_hazelcast-python-client
             -Dsonar.python.coverage.reportPaths=./coverage.xml
+            
+      - name: Analyze with SonarCloud for PR
+        if: github.event_name == 'pull_request'
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN : ${{ secrets.TOKEN_GITHUB }}
+          
+        with:
+          args: >
+            -Dsonar.organization=devopshazelcast-github
+            -Dsonar.projectKey=hazelcast_hazelcast-python-client
+            -Dsonar.python.coverage.reportPaths=./coverage.xml
+            -Dsonar.pullrequest.base= ${{ steps.vars.outputs.branch }}
+            -Dsonar.pullrequest.key= $(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")     
