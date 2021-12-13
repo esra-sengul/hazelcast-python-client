@@ -3,15 +3,15 @@
   on:
     push:
       branches: 
-        - master
-        - 4.*.z
-    pull_request:
+        - pr_target_test
+    pull_request_target:
+      types: [labeled]
       branches: 
-        - master
-        - 4.*.z
+        - pr_target_test
   jobs:
     build-branch:
       runs-on: ubuntu-latest
+      if: contains(github.event.pull_request.labels.*.name, 'safe')
 
       name: Test coverage report
       steps:
@@ -26,9 +26,16 @@
         with:
           distribution: 'adopt'
           java-version: '8'
-
+          
       - name: Checkout code
+        if: github.event_name == 'push'
         uses: actions/checkout@v2
+
+      - name: Checkout PR code
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Install dependencies
         run : |
