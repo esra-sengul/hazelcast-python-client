@@ -11,7 +11,7 @@
   jobs:
     build-branch:
       runs-on: ubuntu-latest
-      if: contains(github.event.pull_request.labels.*.name, 'safe')
+      if: contains(github.event.pull_request.labels.*.name, 'safe') || github.event_name == 'push'
 
       name: Test coverage report
       steps:
