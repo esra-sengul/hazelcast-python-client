@@ -6,7 +6,7 @@ on:
       - master
       - '[45].*.z'
   pull_request_target:
-    type: [labeled]
+    types: [labeled]
     branches:
       - pr_target_test
       - master
@@ -58,7 +58,7 @@ jobs:
             rc_stderr.log
             rc_stdout.log
       - name: Publish results to Codecov
-        if: ${{ matrix.python-version }} == '3.10' || ${{ matrix.os }} == ubuntu-latest
+        if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' }}
         uses: codecov/codecov-action@v1
         with:
           files: ./coverage.xml
