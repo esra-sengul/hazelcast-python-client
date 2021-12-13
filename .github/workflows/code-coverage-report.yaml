@@ -36,6 +36,9 @@
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          
+      - name: Debugging with tmate
+        uses: mxschmitt/action-tmate@v3.8
 
       - name: Install dependencies
         run: |
@@ -48,7 +51,7 @@
         uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: rc-logs-${{ matrix.python-version }}-${{ matrix.os }}
+          name: rc-logs
           path: |
             rc_stderr.log
             rc_stdout.log
