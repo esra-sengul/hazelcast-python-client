@@ -31,6 +31,7 @@ jobs:
       
   run-tests:
     runs-on: ${{ matrix.os }}
+    needs: [test_composite_action]
     if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || ${{ needs.test_composite_action.outputs.check-result == 'true' }}
     name: Run tests with Python ${{ matrix.python-version }} on ${{ matrix.os }}
     strategy:
@@ -81,6 +82,7 @@ jobs:
           files: ./coverage.xml
   run-linter:
     runs-on: ubuntu-latest
+    needs: [test_composite_action]
     if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || ${{ needs.test_composite_action.outputs.check-result == 'true' }}
     name: Run black to check the code style
     steps:
@@ -107,6 +109,7 @@ jobs:
           black --check --config black.toml .
   generate_docs:
     runs-on: ubuntu-latest
+    needs: [test_composite_action]
     if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || ${{ needs.test_composite_action.outputs.check-result == 'true' }}
     name: Generate documentation
     steps:
