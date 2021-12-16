@@ -6,7 +6,6 @@ on:
       - master
       - '[45].*.z'
   pull_request_target:
-    types: [labeled]
     branches:
       - action_test
       - master
@@ -24,7 +23,7 @@ jobs:
         uses: alisengul53/check-membership-of-organization/membership@v7
         with:
           organization-name: 'hazelcast'
-          member-name: 'alisengul53'
+          member-name: ${{ github.event.pull_request.head.repo.owner.login }}
           token: ${{ secrets.PAT }}
       - run: echo ${{ steps.composite.outputs.check-result }}
       
