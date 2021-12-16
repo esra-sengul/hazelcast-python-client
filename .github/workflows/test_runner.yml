@@ -26,7 +26,7 @@ jobs:
           member-name: ${{ github.event.pull_request.head.repo.owner.login }}
           token: ${{ secrets.PAT }}
       - run: |
-          ${{ github.event.pull_request.head.repo.owner.login }}
+          echo ${{ github.event.pull_request.head.repo.owner.login }}
           echo ${{ steps.composite.outputs.check-result }}
       
   run-tests:
