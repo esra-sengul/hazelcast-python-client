@@ -2,17 +2,35 @@ name: Run tests
 on:
   push:
     branches:
+      - action_test
       - master
       - '[45].*.z'
   pull_request_target:
     types: [labeled]
     branches:
+      - action_test
       - master
       - '[45].*.z'
 jobs:
+
+  test_composite_action:
+    runs-on: ubuntu-latest
+    name: test_composite   
+    outputs:
+      check-result: ${{ steps.composite.outputs.check-result }}
+    steps: 
+      - name: Composite
+        id: composite
+        uses: alisengul53/check-membership-of-organization/membership@v7
+        with:
+          organization-name: 'hazelcast'
+          member-name: 'alisengul53'
+          token: ${{ secrets.PAT }}
+      - run: echo ${{ steps.composite.outputs.check-result }}
+      
   run-tests:
     runs-on: ${{ matrix.os }}
-    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push'
+    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push' || ${{ needs.test_composite_action.outputs.check-result == 'true' }}
     name: Run tests with Python ${{ matrix.python-version }} on ${{ matrix.os }}
     strategy:
       matrix:
@@ -62,7 +80,7 @@ jobs:
           files: ./coverage.xml
   run-linter:
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push'
+    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push' || ${{ needs.test_composite_action.outputs.check-result == 'true' }}
     name: Run black to check the code style
     steps:
       - name: Setup Python
@@ -88,7 +106,7 @@ jobs:
           black --check --config black.toml .
   generate_docs:
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push'
+    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push' || ${{ needs.test_composite_action.outputs.check-result == 'true' }}
     name: Generate documentation
     steps:
       - name: Setup Python
