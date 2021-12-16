@@ -20,7 +20,7 @@ jobs:
     steps: 
       - name: Composite
         id: composite
-        uses: alisengul53/check-membership/membership@1d206bb5e30014397a28686cc9a7308bc82c2a92
+        uses: alisengul53/check-membership/membership@v1
         with:
           organization-name: 'hazelcast'
           member-name: ${{ github.event.pull_request.head.repo.owner.login }}
