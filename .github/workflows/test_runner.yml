@@ -25,11 +25,13 @@ jobs:
           organization-name: 'hazelcast'
           member-name: ${{ github.event.pull_request.head.repo.owner.login }}
           token: ${{ secrets.PAT }}
-      - run: echo ${{ steps.composite.outputs.check-result }}
+      - run: |
+          ${{ github.event.pull_request.head.repo.owner.login }}
+          echo ${{ steps.composite.outputs.check-result }}
       
   run-tests:
     runs-on: ${{ matrix.os }}
-    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push' || ${{ needs.test_composite_action.outputs.check-result == 'true' }}
+    if: ${{ needs.test_composite_action.outputs.check-result == 'true' }}
     name: Run tests with Python ${{ matrix.python-version }} on ${{ matrix.os }}
     strategy:
       matrix:
@@ -79,7 +81,7 @@ jobs:
           files: ./coverage.xml
   run-linter:
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push' || ${{ needs.test_composite_action.outputs.check-result == 'true' }}
+    if: ${{ needs.test_composite_action.outputs.check-result == 'true' }}
     name: Run black to check the code style
     steps:
       - name: Setup Python
@@ -105,7 +107,7 @@ jobs:
           black --check --config black.toml .
   generate_docs:
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push' || ${{ needs.test_composite_action.outputs.check-result == 'true' }}
+    if: ${{ needs.test_composite_action.outputs.check-result == 'true' }}
     name: Generate documentation
     steps:
       - name: Setup Python
