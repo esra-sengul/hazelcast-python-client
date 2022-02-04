@@ -32,7 +32,7 @@ class HzRemoteController(RemoteController.Iface):
 
     def exit(self):
         self.remote_controller.exit()
-        self.remote_controller._iprot.trans.close()
+        self.remote_controller.iprot.trans.close()
 
     def createCluster(self, hz_version, xml_config):
         return self.remote_controller.createCluster(hz_version, xml_config)
@@ -69,3 +69,24 @@ class HzRemoteController(RemoteController.Iface):
 
     def executeOnController(self, cluster_id, script, lang):
         return self.remote_controller.executeOnController(cluster_id, script, lang)
+
+    def login(self, uri, api_key, api_secret):
+        return self.remote_controller.login(uri, api_key, api_secret)
+
+    def createStandardCluster(self, hazelcastVersion, isTlsEnabled):
+        return self.remote_controller.createStandardCluster(hazelcastVersion, isTlsEnabled)
+
+    def getCluster(self, id):
+        return self.remote_controller.getCluster(id)
+
+    def scaleUpDownStandardCluster(self, id, scaleNumber):
+        return self.remote_controller.scaleUpDownStandardCluster(id, scaleNumber)
+
+    def stopCluster(self, id):
+        return self.remote_controller.stopCluster(id)
+
+    def resumeCluster(self, id):
+        return self.remote_controller.resumeCluster(id)
+
+    def deleteCluster(self, id):
+        return self.remote_controller.deleteCluster(id)
