@@ -20,7 +20,7 @@ jobs:
     steps: 
       - name: Composite
         id: composite
-        uses: alisengul53/membership-check/membership@v1
+        uses: alisengul53/membership-check/membership@main
         with:
           organization-name: 'hazelcast'
           member-name: 'alisengul53'
