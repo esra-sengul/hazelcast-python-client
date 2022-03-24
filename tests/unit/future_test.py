@@ -21,24 +21,6 @@ class FutureTest(unittest.TestCase):
         Thread(target=set_result).start()
         self.assertEqual(f.result(), "done")
 
-    def test_set_exception(self):
-        f = Future()
-        exc = []
-
-        def set_exception():
-            try:
-                {}["invalid_key"]
-            except KeyError as e:
-                exc.append(sys.exc_info())
-                f.set_exception(e, sys.exc_info()[2])
-
-        Thread(target=set_exception).start()
-        exception = f.exception()
-        traceback = f.traceback()
-        exc = exc[0]
-        self.assertEqual(exc[1], exception)
-        self.assertEqual(exc[2], traceback)
-
     def test_result_raises_exception_with_traceback(self):
         f = Future()
         exc_info = None

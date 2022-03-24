@@ -16,11 +16,6 @@ class SessionStateTest(unittest.TestCase):
     def setUp(self):
         self.state = _SessionState(42, None, 0.05)
 
-    def test_acquire(self):
-        self.assertEqual(0, self.state.acquire_count.get())
-        self.assertEqual(42, self.state.acquire(5))  # session id
-        self.assertEqual(5, self.state.acquire_count.get())
-
     def test_release(self):
         self.state.acquire(5)
         self.state.release(4)
