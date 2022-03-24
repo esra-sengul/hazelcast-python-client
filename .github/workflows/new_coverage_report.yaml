@@ -10,12 +10,8 @@ on:
       - Pull_request_target_integration
       - master
       - '[45].*.z'
-  label:
-    types: [created]
-    branches:
-      - Pull_request_target_integration
-      - master
-      - '[45].*.z'    
+    types:
+      [opened, labeled]
 jobs:
 
   test_composite_action:
