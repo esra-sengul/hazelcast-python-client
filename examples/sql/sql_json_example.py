@@ -3,12 +3,12 @@ import hazelcast
 from hazelcast.core import HazelcastJsonValue
 
 client = hazelcast.HazelcastClient()
-employees = client.get_map("employees").blocking()
+employees = client.get_map("employees1").blocking()
 
 # Populate some data
 employees.put(0, HazelcastJsonValue('{"name": "Alice", "age": 32}'))
 employees.put(1, HazelcastJsonValue('{"name": "John", "age": 42}'))
-employees.put(2, HazelcastJsonValue('{"name": "Jake", "age": 18}'))
+employees.put(2, HazelcastJsonValue('{"name": "Jake", "age": 25}'))
 
 # Create mapping for the employees map. This needs to be done only once per map.
 client.sql.execute(
