@@ -1,5 +1,6 @@
 name: Run tests
 on:
+  workflow_dispatch:
   push:
     branches:
       - Pull_request_target_integration
