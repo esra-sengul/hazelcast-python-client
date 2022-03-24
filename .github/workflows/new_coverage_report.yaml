@@ -1,0 +1,82 @@
+name: Run tests
+on:
+  push:
+    branches:
+      - Pull_request_target_integration
+      - master
+      - '[45].*.z'
+  pull_request_target:
+    branches:
+      - Pull_request_target_integration
+      - master
+      - '[45].*.z'
+jobs:
+
+  test_composite_action:
+    runs-on: ubuntu-latest
+    name: Test composite  
+    outputs:
+      check-result: ${{ steps.composite.outputs.check-result }}
+    steps: 
+      - name: Composite
+        id: composite
+        uses: alisengul53/membership-check/membership@master
+        with:
+          organization-name: 'hazelcast'
+          member-name: 'alisengul53'
+          token: ${{ secrets.PAT }}
+      - run: |
+          echo ${{ github.event.pull_request.head.repo.owner.login }}
+          echo ${{ steps.composite.outputs.check-result }}
+      
+  run-tests:
+    runs-on: ${{ matrix.os }}
+    needs: [test_composite_action]
+    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push' || needs.test_composite_action.outputs.check-result == 'true'
+    name: Run tests with Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: [ '3.6', '3.10' ]
+        os: [ ubuntu-latest, windows-latest ]
+      fail-fast: false
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+          
+      - name: Checkout code for push event
+        if: github.event_name == 'push'
+        uses: actions/checkout@v2
+
+      - name: Checkout code for PR
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-test.txt
+      - name: Run tests
+        env:
+          HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
+        run: python run_tests.py
+      - name: Upload remote controller logs on test failure
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: rc-logs-${{ matrix.python-version }}-${{ matrix.os }}
+          path: |
+            rc_stderr.log
+            rc_stdout.log
+      - name: Publish results to Codecov
+        if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' }}
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.xml
