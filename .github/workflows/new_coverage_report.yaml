@@ -73,8 +73,13 @@ jobs:
       - name: Checkout code for PR
         if: github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v2
-        with:
-          ref: pull/${{ github.event.inputs.pr_number }}/head
+        
+      - name: Checkout PR external
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cd hazelcast-python-client
+          git fetch origin pull/${{githu.event.inputs.pr_number }}/head:temp_branch
+          git checkout temp_branch
           
       - name: Install dependencies
         run: |
