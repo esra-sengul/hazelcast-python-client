@@ -1,6 +1,10 @@
 name: Run tests
 on:
   workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Enter PR number to run coverage on it
+        required: true
   push:
     branches:
       - Pull_request_target_integration
@@ -70,7 +74,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: pull/${{ github.event.inputs.pr_number }}/head
           
       - name: Install dependencies
         run: |
@@ -87,12 +91,20 @@ jobs:
           path: |
             rc_stderr.log
             rc_stdout.log
+            
       - name: Publish results to Codecov for PR
         if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' &&  github.event_name == 'pull_request_target' }}
         uses: codecov/codecov-action@v1
         with:
           files: ./coverage.xml
           override_pr: ${{ github.event.pull_request.number }}
+          
+      - name: Publish result to Codecov for PR coming from community
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.xml
+          override_pr: ${{ github.event.inputs.pr_number }}
           
       - name: Publish results to Codecov for Push
         if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' &&  github.event_name == 'push' }}
