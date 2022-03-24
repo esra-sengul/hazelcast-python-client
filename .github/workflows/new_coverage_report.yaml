@@ -19,30 +19,24 @@ on:
       [opened, labeled]
 jobs:
 
-  test_composite_action:
+  check_for_membership:
     runs-on: ubuntu-latest
-    name: Test composite  
+    name: Check membership of given user  
     outputs:
       check-result: ${{ steps.composite.outputs.check-result }}
     steps: 
-      - name: Composite
+      - name: Action for membership check
         id: composite
         uses: alisengul53/membership-check/membership@main
         with:
           organization-name: 'hazelcast'
           member-name: ${{ github.event.pull_request.head.repo.owner.login }}
           token: ${{ secrets.PAT }}
-      - run: |
-          echo ${{ github.event.pull_request.head.repo.owner.login }}
-          echo ${{ steps.composite.outputs.check-result }}
-          echo ${{ github.event_name }}
-          echo ${{ contains(github.event.pull_request.labels.*.name, 'pr_builder') }}
-          echo ${{ github.event.number }}
           
   run-tests:
     runs-on: ${{ matrix.os }}
-    needs: [test_composite_action]
-    if: contains(github.event.pull_request.labels.*.name, 'pr_builder') || github.event_name == 'push' || needs.test_composite_action.outputs.check-result == 'true' || github.event_name == 'workflow_dispatch'
+    needs: [check_for_membership]
+    if: github.event_name == 'push' || needs.test_composite_action.outputs.check-result == 'true' || github.event_name == 'workflow_dispatch'
     name: Run tests with Python ${{ matrix.python-version }} on ${{ matrix.os }}
     strategy:
       matrix:
@@ -70,14 +64,11 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           
-      - name: Checkout code for PR
+      - name: Checkout repository
         if: github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v2
         
-      - name: Debugging with tmate
-        uses: mxschmitt/action-tmate@v3.11
-        
-      - name: Checkout PR external
+      - name: Fetch PR coming from community
         if: github.event_name == 'workflow_dispatch'
         run: |
           git fetch origin pull/${{github.event.inputs.pr_number }}/head:temp_branch
@@ -90,14 +81,6 @@ jobs:
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
         run: python run_tests.py
-      - name: Upload remote controller logs on test failure
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: rc-logs-${{ matrix.python-version }}-${{ matrix.os }}
-          path: |
-            rc_stderr.log
-            rc_stdout.log
             
       - name: Publish results to Codecov for PR
         if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' &&  github.event_name == 'pull_request_target' }}
@@ -106,15 +89,25 @@ jobs:
           files: ./coverage.xml
           override_pr: ${{ github.event.pull_request.number }}
           
-      - name: Publish result to Codecov for PR coming from community
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: codecov/codecov-action@v1
-        with:
-          files: ./coverage.xml
-          override_pr: ${{ github.event.inputs.pr_number }}
-          
       - name: Publish results to Codecov for Push
         if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' &&  github.event_name == 'push' }}
         uses: codecov/codecov-action@v1
         with:
           files: ./coverage.xml
+          
+      - name: Publish result to Codecov for PR coming from community
+        if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' && github.event_name == 'workflow_dispatch' }}
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.xml
+          override_pr: ${{ github.event.inputs.pr_number }}
+          
+          
+      - name: Upload remote controller logs on test failure
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: rc-logs-${{ matrix.python-version }}-${{ matrix.os }}
+          path: |
+            rc_stderr.log
+            rc_stdout.log
