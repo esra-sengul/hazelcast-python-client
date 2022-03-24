@@ -10,6 +10,12 @@ on:
       - Pull_request_target_integration
       - master
       - '[45].*.z'
+  label:
+    types: [created]
+    branches:
+      - Pull_request_target_integration
+      - master
+      - '[45].*.z'    
 jobs:
 
   test_composite_action:
@@ -23,12 +29,14 @@ jobs:
         uses: alisengul53/membership-check/membership@main
         with:
           organization-name: 'hazelcast'
-          member-name: 'alisengul53'
+          member-name: ${{ github.event.pull_request.head.repo.owner.login }}
           token: ${{ secrets.PAT }}
       - run: |
           echo ${{ github.event.pull_request.head.repo.owner.login }}
           echo ${{ steps.composite.outputs.check-result }}
-      
+          echo ${{ github.event_name }}
+          echo ${{ github.event.pull_request.labels.*.name }}
+          
   run-tests:
     runs-on: ${{ matrix.os }}
     needs: [test_composite_action]
@@ -36,8 +44,8 @@ jobs:
     name: Run tests with Python ${{ matrix.python-version }} on ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [ '3.6', '3.10' ]
-        os: [ ubuntu-latest, windows-latest ]
+        python-version: [ '3.10' ]
+        os: [ ubuntu-latest ]
       fail-fast: false
     steps:
       - name: Setup Python
@@ -75,8 +83,15 @@ jobs:
           path: |
             rc_stderr.log
             rc_stdout.log
-      - name: Publish results to Codecov
-        if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' }}
+      - name: Publish results to Codecov for PR
+        if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' &&  github.event_name == 'pull_request_target' }}
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.xml
+          override_pr: ${{ github.event.pull_request.number }}
+          
+      - name: Publish results to Codecov for Push
+        if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' &&  github.event_name == 'push' }}
         uses: codecov/codecov-action@v1
         with:
           files: ./coverage.xml
