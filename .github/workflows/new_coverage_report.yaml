@@ -78,7 +78,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           cd hazelcast-python-client
-          git fetch origin pull/${{githu.event.inputs.pr_number }}/head:temp_branch
+          git fetch origin pull/${{github.event.inputs.pr_number }}/head:temp_branch
           git checkout temp_branch
           
       - name: Install dependencies
