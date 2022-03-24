@@ -35,7 +35,7 @@ jobs:
           echo ${{ github.event.pull_request.head.repo.owner.login }}
           echo ${{ steps.composite.outputs.check-result }}
           echo ${{ github.event_name }}
-          echo ${{ github.event.pull_request.labels.*.name }}
+          echo ${{ contains(github.event.pull_request.labels.*.name, 'pr_builder') }}
           
   run-tests:
     runs-on: ${{ matrix.os }}
