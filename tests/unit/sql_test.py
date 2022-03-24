@@ -71,19 +71,6 @@ class SqlMockTest(unittest.TestCase):
         self.assertIsInstance(result.get_row_metadata(), SqlRowMetadata)
         self.assertEqual(EXPECTED_ROWS, self.get_rows_from_blocking_iterator(result))
 
-    def test_iterator_with_update_count(self):
-        self.set_execute_response_with_update_count()
-        result = self.result.result()
-
-        self.assertEqual(EXPECTED_UPDATE_COUNT, result.update_count())
-        self.assertFalse(result.is_row_set())
-
-        with self.assertRaises(ValueError):
-            result.get_row_metadata()
-
-        with self.assertRaises(ValueError):
-            result.iterator()
-
     def test_blocking_iterator_with_update_count(self):
         self.set_execute_response_with_update_count()
         result = self.result.result()
