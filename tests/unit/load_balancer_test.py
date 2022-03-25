@@ -21,23 +21,3 @@ class LoadBalancersTest(unittest.TestCase):
         lb = RandomLB()
         lb.init(cluster)
         self.assertIsNone(lb.next())
-
-    def test_round_robin_lb_with_no_members(self):
-        cluster = _MockClusterService([])
-        lb = RoundRobinLB()
-        lb.init(cluster)
-        self.assertIsNone(lb.next())
-
-    def test_random_lb_with_members(self):
-        cluster = _MockClusterService([0, 1, 2])
-        lb = RandomLB()
-        lb.init(cluster)
-        for _ in range(10):
-            self.assertTrue(0 <= lb.next() <= 2)
-
-    def test_round_robin_lb_with_members(self):
-        cluster = _MockClusterService([0, 1, 2])
-        lb = RoundRobinLB()
-        lb.init(cluster)
-        for i in range(10):
-            self.assertEqual(i % 3, lb.next())
