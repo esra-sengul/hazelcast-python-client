@@ -5,11 +5,11 @@ on:
       pr_number:
         description: Enter PR number to run coverage on it
         required: true
-  push:
-    branches:
-      - Pull_request_target_integration
-      - master
-      - '[45].*.z'
+#  push:
+#    branches:
+#      - Pull_request_target_integration
+#      - master
+#      - '[45].*.z'
   pull_request_target:
     branches:
       - Pull_request_target_integration
@@ -34,7 +34,7 @@ jobs:
       - name: Run echo
         run: |
           echo ${{ github.event.pull_request.head.repo.owner.login }}
-          echo ${{ needs.test_composite_action.outputs.check-result }}
+          echo needs.test_composite_action.outputs.check-result
           
   run-tests:
     runs-on: ${{ matrix.os }}
