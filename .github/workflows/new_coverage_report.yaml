@@ -31,7 +31,6 @@ jobs:
           organization-name: 'hazelcast'
           member-name: ${{ github.event.pull_request.head.repo.owner.login }}
           token: ${{ secrets.PAT }}
-      - name: Run echo
           
   run-tests:
     runs-on: ${{ matrix.os }}
