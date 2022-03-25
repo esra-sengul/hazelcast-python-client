@@ -32,14 +32,11 @@ jobs:
           member-name: ${{ github.event.pull_request.head.repo.owner.login }}
           token: ${{ secrets.PAT }}
       - name: Run echo
-        run: |
-          echo ${{ github.event.pull_request.head.repo.owner.login }}
-          echo needs.test_composite_action.outputs.check-result
           
   run-tests:
     runs-on: ${{ matrix.os }}
     needs: [check_for_membership]
-    if: github.event_name == 'push' || needs.test_composite_action.outputs.check-result == 'true' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push' || needs.check_for_membership.outputs.check-result == 'true' || github.event_name == 'workflow_dispatch'
     name: Run tests with Python ${{ matrix.python-version }} on ${{ matrix.os }}
     strategy:
       matrix:
