@@ -27,7 +27,7 @@ jobs:
     steps: 
       - name: Action for membership check
         id: composite
-        uses: alisengul53/membership-check/membership@main
+        uses: hazelcast/hazelcast-tpm/membership@main
         with:
           organization-name: 'hazelcast'
           member-name: ${{ github.event.pull_request.head.repo.owner.login }}
